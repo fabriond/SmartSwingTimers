@@ -1,0 +1,7 @@
+## Interface: 16001
+## Version: 1.0
+## Title: Smart Swing Timers
+## Notes: Automatically hides and shows native swing timers.
+## Author: Fabriond
+
+SmartSwingTimers.lua
