@@ -1,7 +1,5 @@
 # Smart Swing Timers
-An extremely light-weight addon for World of Warcraft that shows and hides the default UI swing timers according to which type of auto-attack is being performed and hides them when out of combat.
-
-Note: the swing timers must be in "always display" mode in the Edit Mode options for this addon to work correctly
+An extremely light-weight addon for World of Warcraft that shows and hides the default UI swing timers according to which type of auto-attack was last performed.
 
 So far it has been tested and works on Patch 1.60.01 of Forever
 

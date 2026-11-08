@@ -5,15 +5,6 @@ local addon = CreateFrame("Frame")
 -- ==========================================
 
 local CONFIG = {
-    meleeFrames = {
-        "SwingTimerMainHandFrame",
-        "SwingTimerOffHandFrame",
-    },
-
-    rangedFrames = {
-        "SwingTimerRangedFrame",
-    },
-
     debug = false,
 }
 
@@ -42,25 +33,13 @@ local function RegisterFrames()
     wipe(meleeFrames)
     wipe(rangedFrames)
 
-    for _, name in ipairs(CONFIG.meleeFrames) do
-        local frame = _G[name]
+    local mainHandFrame = _G["SwingTimerMainHandFrame"]
+    local offHandFrame = _G["SwingTimerOffHandFrame"]
+    local rangedFrame = _G["SwingTimerRangedFrame"]
 
-        if frame then
-            table.insert(meleeFrames, frame)
-        else
-            Print("Could not find melee frame: " .. name)
-        end
-    end
-
-    for _, name in ipairs(CONFIG.rangedFrames) do
-        local frame = _G[name]
-
-        if frame then
-            table.insert(rangedFrames, frame)
-        else
-            Print("Could not find ranged frame: " .. name)
-        end
-    end
+    if mainHandFrame then table.insert(meleeFrames, mainHandFrame) end
+    if offHandFrame then table.insert(meleeFrames, offHandFrame) end
+    if rangedFrame then table.insert(rangedFrames, rangedFrame) end
 end
 
 -- ==========================================
@@ -79,62 +58,18 @@ local function UpdateVisibility()
     SetVisibility(rangedFrames, rangedEnabled)
 end
 
-local function AllFramesReady()
-    local allFramesReady = true
-
-    for _, name in ipairs(CONFIG.meleeFrames) do
-        if not _G[name] then
-            allFramesReady = false
-            break
-        end
-    end
-
-    if allFramesReady then
-        for _, name in ipairs(CONFIG.rangedFrames) do
-            if not _G[name] then
-                allFramesReady = false
-                break
-            end
-        end
-    end
-
-    return allFramesReady
-end
-
-
-local function InitializeVisibility()
-
-    local initialized = false
-
-    addon:SetScript("OnUpdate", function(self)
-        if AllFramesReady then
-            RegisterFrames()
-            UpdateVisibility()
-
-            initialized = true
-
-            Print("Swing timers initialized")
-
-            self:SetScript("OnUpdate", nil)
-        end
-    end)
-
-end
-
 -- ==========================================
 -- EVENT HANDLING
 -- ==========================================
 
 addon:RegisterEvent("PLAYER_ENTERING_WORLD")
 addon:RegisterEvent("PLAYER_SWING")
-addon:RegisterEvent("PLAYER_IN_COMBAT_CHANGED")
-addon:RegisterEvent("PLAYER_TARGET_DIED")
-addon:RegisterEvent("PLAYER_DEAD")
 
 addon:SetScript("OnEvent", function(self, event, ...)
     Print(event)
     if event == "PLAYER_ENTERING_WORLD" then
-        InitializeVisibility()
+        RegisterFrames()
+        UpdateVisibility()
 
         Print("Loaded successfully")
     elseif event == "PLAYER_SWING" then
@@ -147,20 +82,6 @@ addon:SetScript("OnEvent", function(self, event, ...)
             meleeEnabled = false
             rangedEnabled = true
         end
-
-        UpdateVisibility()
-    elseif event == "PLAYER_IN_COMBAT_CHANGED" then
-        local inCombat = ...
-
-        if not inCombat then
-            meleeEnabled = false
-            rangedEnabled = false
-
-            UpdateVisibility()
-        end
-    elseif event == "PLAYER_DEAD" or event == "PLAYER_TARGET_DIED" then
-        meleeEnabled = false
-        rangedEnabled = false
 
         UpdateVisibility()
     end
