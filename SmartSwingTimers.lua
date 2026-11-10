@@ -8,6 +8,9 @@ local CONFIG = {
     debug = false,
 }
 
+local MELEE_ATTACK_SPELL_ID = 6603
+local RANGED_ATTACK_SPELL_ID = 75
+
 -- ==========================================
 -- ATTACK STATES
 -- ==========================================
@@ -64,6 +67,7 @@ end
 
 addon:RegisterEvent("PLAYER_ENTERING_WORLD")
 addon:RegisterEvent("PLAYER_SWING")
+addon:RegisterEvent("UNIT_SPELLCAST_START")
 
 addon:SetScript("OnEvent", function(self, event, ...)
     Print(event)
@@ -75,15 +79,31 @@ addon:SetScript("OnEvent", function(self, event, ...)
     elseif event == "PLAYER_SWING" then
         local swingDuration, swingType = ...
 
+        meleeEnabled = false
+        rangedEnabled = false
+
         if swingType == Enum.PlayerSwingType.MainHand or swingType == Enum.PlayerSwingType.OffHand then
             meleeEnabled = true
-            rangedEnabled = false
         elseif swingType == Enum.PlayerSwingType.Ranged then
-            meleeEnabled = false
             rangedEnabled = true
         end
 
         UpdateVisibility()
+    elseif event == "UNIT_SPELLCAST_START" then
+        local unit, castGUID, spellID, castBarID = ...
+
+        if unit == "player" then
+            meleeEnabled = false
+            rangedEnabled = false
+
+            if spellID == MELEE_ATTACK_SPELL_ID then
+                meleeEnabled = true
+            elseif spellID == RANGED_ATTACK_SPELL_ID then
+                rangedEnabled = true
+            end
+
+            UpdateVisibility()
+        end
     end
 end)
 
